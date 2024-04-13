@@ -1,7 +1,5 @@
-#Create a dockerfil with access to CUDA and Cudnn
-FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
+FROM nvidia/cuda:11.8.0-base-ubuntu20.04
 
-# Install some basic utilities
 RUN apt-get update && apt-get install -y \
     curl \
     ca-certificates \
@@ -11,16 +9,36 @@ RUN apt-get update && apt-get install -y \
     libx11-6 \
  && rm -rf /var/lib/apt/lists/*
 
-#make dockerfile app capable of accessing a folder called images on my computer
-VOLUME /images
-# Create a working directory
+# Define volumes (adjust paths as needed)
+#models should be downloaded from
+#https://drive.google.com/drive/u/0/folders/17VYV_SoZZesU6mbxz2dMAIccSSlqLecY 
+COPY /models .
+COPY /images .
+
+# Create working directory
 RUN mkdir /app
 WORKDIR /app
+RUN apt-get update && apt-get install -y \
+    curl \
+    ca-certificates \
+    sudo \
+    git \
+    bzip2 \
+    libx11-6 \
+    python3-pip  # Install python3-pip \ 
+    rm -rf /var/lib/apt/lists/*
 
-RUN git clone https://github.com/xinntao/ESRGAN \ 
-    Get model https://drive.google.com/drive/u/0/folders/17VYV_SoZZesU6mbxz2dMAIccSSlqLecY \
-    pip install Pytorch CUDA \
-    Install deps pip install opencv-python glob2
+# Install libgl1-mesa-glx
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+ && rm -rf /var/lib/apt/lists/*
 
-#run bash
-CMD ["/bin/bash"]
+
+# Install dependencies
+RUN pip install torch opencv-python glob2
+
+# Clone ESRGAN repository (replace with your actual main script)
+RUN git clone https://github.com/xinntao/ESRGAN
+
+# Set entrypoint (replace with your main script)
+CMD [ "bash" ]
